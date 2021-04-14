@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<title>ESP_EggBot</title>
+	<meta name="description" content="EggBot">
+	<meta name="keywords" content="EggBot,ESP8266">
+	<meta http-equiv="X-Ua-Compatible" content="IE=edge">
+	<link rel="stylesheet" href="main.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="main.js"></script>
+</head>
+<body>
+	<form id="form_svg" action="" enctype = "multipart/form-data" method = "post">
+		<p>Plik SVG: <input type="file" name="filename" id="file" /></p>
+		<p><input type="button" value="Drukuj" id="but_upload"/></p>
+	</form>
+	<canvas id="canvas" height="400" width="1600">
+	</canvas>
+<div id="myProgress"><div id="myBar"></div></div>
+</body>
+</html>
