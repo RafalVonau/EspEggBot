@@ -8,7 +8,6 @@ var scale = 0.5;
 var canvas = null;
 var ctx = null;
 
-
 function addMessage(m) {
 	console.log(m);
 }
@@ -50,6 +49,11 @@ function drawLine(x,y,g)
 	}
 	gx = x;
 	gy = y;
+	/* Roll over */
+	while (gx >= canvas.width)   gx -= canvas.width;
+	while (gy >= canvas.height)  gy -= canvas.height;
+	while (gx <= -canvas.width)  gx += canvas.width;
+	while (gy <= -canvas.height) gy += canvas.height;
 }
 
 
