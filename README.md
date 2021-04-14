@@ -7,19 +7,21 @@ An [EggBot](https://egg-bot.com/) is a machine for drawing on eggs. I built an e
 I'm using an D1 mini(ESP8266) for controlling the steppers and the servo. 
 
 The project is based on:
-- [EggDuino](https://github.com/schlion/EggDuino) - some code ported to ESP8266,
-- [EggBot Inkscape plugin](http://wiki.evilmadscientist.com/Installing_software) - I modified the plugin to automatically detect the USB to UART converter present on the D1 mini board and in case it fails to detect the USB converter, try to connect via TCP with eggbot.local:2500 address.
+- [EggDuino](https://github.com/schlion/EggDuino) - some code ported to ESP8266
+- [EggBot Inkscape plugin](http://wiki.evilmadscientist.com/Installing_software) - I modified the plugin to automatically detect the USB to UART converter present on the D1 mini board and in case it fails to detect the USB converter, try to connect via TCP with eggbot.local:2500 address
+- [EggEsp](https://github.com/M4GNV5/EggEsp) - svg to gcode parser
+- [SvgToGCode](https://github.com/evomotors/SvgToGCode) - svg to gcode parser
 
 Features:
 - Implemented Eggbot-Protocol-Version 2.1.0
 - Turn-on homing: switch-on position of pen will be taken as reference point.
 - No collision-detection!!
 - Supported Servos: standard analog mini servos like TG9e, SG90, ES08MA, HXT900, etc.
-- Taking svgs directly (over www) -> no need for external software (needs internet connection).
+- Taking svgs directly (over www) -> no need for external software.
 - Inkscape plugin (commands over serial port or TCP socket on port 2500).
 
 The test project was built on D1 mini board connected to PC computer over USB as /dev/ttyUSB0 under Linux.
-Modify Wifi client settings in main.cpp file:
+Uncomment and modify Wifi client settings in secrets.h file:
 * #define WIFI_SSID                "EggBot"
 * #define WIFI_PASS                "EggBotPass"
 

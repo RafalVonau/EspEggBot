@@ -31,31 +31,26 @@ static void handle_request(AsyncWebServerRequest *request, char *type, const uin
 }
 //====================================================================================
 
-static void handle_upload(AsyncWebServerRequest *request, String filename, size_t index, uint8_t *data, size_t len, bool final)
-{
-	if(!index){
-		Serial.printf("UploadStart: %s\n", filename.c_str());
-	}
-	for(size_t i=0; i<len; i++){
-		Serial.write(data[i]);
-	}
-	if (final){
-		Serial.printf("UploadEnd: %s, %u B\n", filename.c_str(), index+len);
-	}
-}
-//====================================================================================
-
 HTTPCommand::HTTPCommand(CommandDB *db): Command(db)
 {
 	m_server = new AsyncWebServer(80);
 	m_events = new AsyncEventSource("/events");
 
 	m_server->on("/", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/html", __index_html, www_index_html_size);});
+	/* Java Script */
 	m_server->on("/main.js", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/javascript", __main_js, www_main_js_size);});
 	m_server->on("/jquery.min.js", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/javascript", __jquery_min_js, www_jquery_min_js_size);});
+#if defined(www_bezier_js_size)
+	m_server->on("/bezier.js", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/javascript", __bezier_js, www_bezier_js_size);});
+#endif
+#if defined(www_nanosvg_js_size)
+	m_server->on("/nanosvg.js", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/javascript", __nanosvg_js, www_nanosvg_js_size);});
+#endif
+	/* CSS */
 	m_server->on("/main.css", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/css", __main_css, www_main_css_size);});
+#if defined(www_bulma_min_css_size)
 	m_server->on("/bulma.min.css ", HTTP_GET, [](AsyncWebServerRequest *request){handle_request(request, "text/css", __bulma_min_css, www_bulma_min_css_size);});
-	
+#endif
 	m_server->on("/post", HTTP_POST, [this](AsyncWebServerRequest *request) {
 		String message;
 		if (request->hasParam("cmd", true)) {

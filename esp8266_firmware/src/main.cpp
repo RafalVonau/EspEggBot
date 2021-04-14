@@ -1,11 +1,18 @@
 /*
- * EspEggBot-firmware by Rafal Vonau (ESP8266 port)
+ * EggD1-Firmware by Rafal Vonau (ESP8266 port)
  *
  * Based on: Eggduino-Firmware by Joachim Cerny, 2014
  *
  * Thanks to the Eggbot-Team for such a funny and enjoable concept!
  * Thanks to my wife and my daughter for their patience. :-)
  */
+
+// implemented Eggbot-Protocol-Version v13
+// EBB-Command-Reference, I sourced from: http://www.schmalzhaus.com/EBB/EBBCommands.html
+// no homing sequence, switch-on position of pen will be taken as reference point.
+// No collision-detection!!
+// Note: Maximum-Speed in Inkscape is 1000 Steps/s. You could enter more, but then Pythonscript sends nonsense.
+// EBB-Coordinates are coming in for 16th-Microstepmode. The Coordinate-Transforms are done in weired integer-math. Be careful, when you diecide to modify settings.
 
 // ==-- HW connection --==
 // STEP1(EGG)- GPIO14 (D5)
@@ -23,9 +30,9 @@ extern "C" {
 	#include <os_type.h>
 }
 #include <functional>
-#include <ESPAsyncTCP.h>
+#include <ESPAsyncTCP.h>       /* ESPAsyncTCP-esphome@1.2.2                   */
 #include <ArduinoOTA.h>
-#include "SerialCommand.h"
+#include "SerialCommand.h" //nice lib from Stefan Rado, https://github.com/kroimon/Arduino-SerialCommand
 #include "NetworkCommand.h"
 #include "HTTPCommand.h"
 #include <EEPROM_Rotate.h>
@@ -37,9 +44,6 @@ extern "C" {
 #define HOSTNAME                 "eggbot"
 #define NPORT                    (2500)
 
-#define WIFI_SSID                "EggBot"
-#define WIFI_PASS                "EggBotPass"
-
 #if 1
 #undef DEBUG_ENABLED
 #define pdebug(fmt, args...)
@@ -49,6 +53,20 @@ extern "C" {
 #define pdebug(fmt, args...) Serial.printf(fmt, ## args)
 #define pwrite(fmt, len) Serial.write(fmt, len)
 #endif
+
+DNSServer          dnsServer;
+class WiFiManager {
+	public:
+	WiFiManager() {}
+	void autoConnect(String x) {
+		pdebug("Starting in AP mode\n");
+		WiFi.softAP("EspEggBootAP");
+		dnsServer.start(53, "*", WiFi.softAPIP());
+	}
+};
+#include "secrets.h"
+
+
 
 /*=================*/
 /* PIN definitions */
@@ -75,7 +93,6 @@ extern "C" {
 //====================================================================================
 //=================================-- VARIABLES --====================================
 //====================================================================================
-DNSServer          dnsServer;
 Motion2D          *m2d;
 CommandDB         CmdDB;
 SerialCommand     *SCmd;
@@ -134,8 +151,6 @@ void unrecognized(const char *command, Command *c) {c->print("!8 Err: Unknown co
  */
 void setup()
 {
-	int WifiCounter = 0, got_one = 1;
-
 	Serial.begin(9600);
 	pdebug("SETUP:START\n");
 	/* Setup GPIO pins */
@@ -144,33 +159,17 @@ void setup()
 
 	/* Connect to WiFi */
 	digitalWrite(enableMotor, LOW);
-	WiFi.hostname(HOSTNAME);
-	WiFi.mode(WIFI_STA);
-	WiFi.disconnect();
-	pdebug("Connecting to WiFi network\n");
-	WiFi.begin ( WIFI_SSID, WIFI_PASS );
-	while ( WiFi.status() != WL_CONNECTED ) {
-		pdebug(".");
-		delay (500);
-		WifiCounter++;
-		if (WifiCounter >=20) {
-			got_one = 0;
-			break;
-		}
-	}
-	if (got_one == 0) {
-		pdebug("Starting in AP mode\n");
-		WiFi.softAP("EspEggBootAP");
-		dnsServer.start(53, "*", WiFi.softAPIP());
-	}
-
+	detect_network();
 	digitalWrite(enableMotor, HIGH);
+
+	pdebug("WIFI::IP address: %s\n", WiFi.localIP().toString().c_str());
 	/* Setup OTA */
 	ArduinoOTA.setHostname(HOSTNAME);
 	ArduinoOTA.onStart([]() {
 		otaInProgress = 1;
 	});
 	ArduinoOTA.begin();
+	pdebug("SETUP:START\n");
 	makeComInterface();
 #ifdef engraverPin
 	pinMode(engraverPin, OUTPUT);
@@ -329,13 +328,13 @@ void stepperMove(CommandQueueItem *c)
 //====================================================================================
 
 static int g_pos_x = 0;
-static int g_pos_y = 0;
+static int g_pos_y = 400;
 static int g_pen   = 0;
 
 void cmdG90(CommandQueueItem *c)
 {
 	g_pos_x = 0;
-	g_pos_y = 0;
+	g_pos_y = 400;
 	g_pen   = 1;
 	m2d->setPenUp(200);
 	c->sendAck();

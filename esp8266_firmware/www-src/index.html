@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<title>ESP_EggBot</title>
-	<meta name="description" content="EggBot">
-	<meta name="keywords" content="EggBot,ESP8266">
-	<meta http-equiv="X-Ua-Compatible" content="IE=edge">
-	<link rel="stylesheet" href="main.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="main.js"></script>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>EspEggBot</title>
+	<style>
+		body{padding: 10px;}
+		canvas{border:1px solid #d3d3d3; background-color: white;}
+		.alert-success{background-color: lightblue}
+		.alert-error{background-color: red}
+		p{margin-bottom:20px; border:1px solid #d3d3d3; background-color: white; padding:5px}
+	</style>
 </head>
 <body>
-	<form id="form_svg" action="" enctype = "multipart/form-data" method = "post">
-		<p>Plik SVG: <input type="file" name="filename" id="file" /></p>
-		<p><input type="button" value="Drukuj" id="but_upload"/></p>
-	</form>
-	<canvas id="canvas" height="400" width="1600">
-	</canvas>
-<div id="myProgress"><div id="myBar"></div></div>
+	<div class="alert alert-success">
+		<strong>Success!</strong>
+	</div>
+	<div class="alert alert-error">
+		<strong>Error!</strong>
+	</div>
+	<br />
+	<input type="file" id="File1" onchange="readURL(this);">
+	<div id="canvases"></div>
+	<script src="jquery.min.js"></script>
 </body>
+<script src="main.js"></script>
+<script src="bezier.js"></script>
+<script src="nanosvg.js"></script>
 </html>
