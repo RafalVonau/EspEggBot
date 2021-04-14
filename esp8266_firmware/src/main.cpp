@@ -119,6 +119,9 @@ void setEngraver(CommandQueueItem *c);
 void pinOutput(CommandQueueItem *c);
 void setNodeCount(CommandQueueItem *c);
 void setLayer(CommandQueueItem *c);
+void cmdG90(CommandQueueItem *c);
+void cmdG0(CommandQueueItem *c);
+void cmdG1(CommandQueueItem *c);
 void unrecognized(const char *command, Command *c) {c->print("!8 Err: Unknown command\r\n");}
 
 
@@ -269,6 +272,10 @@ void makeComInterface()
 	CmdDB.addCommand("QL",[](CommandQueueItem *c){c->printInt(layer);});
 	CmdDB.addCommand("QP",[](CommandQueueItem *c){c->printInt((m2d->m_penState == m2d->m_penUpPos)?0:1);});
 	CmdDB.addCommand("QB",[](CommandQueueItem *c){c->printInt(prgButtonState);prgButtonState = 0;});  //"PRG" Button,
+	/* For www parse */
+	CmdDB.addCommand("G90", cmdG90, true);
+	CmdDB.addCommand("G0", cmdG0, true);
+	CmdDB.addCommand("G1", cmdG1, true);
 	//CmdDB.addCommand("XX",[](CommandQueueItem *c){c->printInt(tticks);});
 	CmdDB.addCommand("XX",[](CommandQueueItem *c){m2d->printStat(c);});
 	CmdDB.setDefaultHandler(unrecognized); // Handler for command that isn't matched (says "What?")
@@ -320,6 +327,74 @@ void stepperMove(CommandQueueItem *c)
 	m2d->goTo(duration, rotStepsEBB, penStepsEBB);
 }
 //====================================================================================
+
+static int g_pos_x = 0;
+static int g_pos_y = 0;
+static int g_pen   = 0;
+
+void cmdG90(CommandQueueItem *c)
+{
+	g_pos_x = 0;
+	g_pos_y = 0;
+	g_pen   = 1;
+	m2d->setPenUp(200);
+	c->sendAck();
+}
+//====================================================================================
+
+static void cmdAbsMove(CommandQueueItem *c, int speed)
+{
+	int newX = c->m_arg0;
+	int newY = c->m_arg1;
+	int aX, dX = newX - g_pos_x;
+	int aY, dY = newY - g_pos_y;
+	uint32_t duration = 0;
+
+	if (dX < 0) aX = -dX; else aX = dX;
+	if (dY < 0) aY = -dY; else aY = dY;
+
+	/* Calculate duration in [ms] */
+	if (aX || aY) {
+		if (aX > aY) {
+			duration = (aX * 1000)/speed;
+		} else {
+			duration = (aY * 1000)/speed;
+		}
+	}
+	m2d->goTo((uint16_t)duration, dX, dY);
+	g_pos_x = newX;
+	g_pos_y = newY;
+	c->sendAck();
+}
+//====================================================================================
+
+void cmdG0(CommandQueueItem *c)
+{
+	/* ABS pos for X and Y */
+	if ((c->m_arg_mask & 3) != 3) {
+		c->sendError();
+		return;
+	}
+	/* Set pen UP */
+	if (!g_pen) {m2d->setPenUp(200);g_pen = 1;}
+	cmdAbsMove(c, 400);
+}
+//====================================================================================
+
+void cmdG1(CommandQueueItem *c)
+{
+	/* ABS pos for X and Y */
+	if ((c->m_arg_mask & 3) != 3) {
+		c->sendError();
+		return;
+	}
+	/* Set pen Down */
+	if (g_pen) {m2d->setPenDown(400);g_pen = 0;}
+	cmdAbsMove(c, 300);
+}
+//====================================================================================
+
+
 
 void setPen(CommandQueueItem *c)
 {

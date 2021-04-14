@@ -85,6 +85,9 @@ public:
 		pos++;
 		pos &= MOTION_QUEUE_MASK;
 		if (pos == m_motionQRd) return 1;
+		pos++;
+		pos &= MOTION_QUEUE_MASK;
+		if (pos == m_motionQRd) return 1;
 		return 0;
 	}
 	
