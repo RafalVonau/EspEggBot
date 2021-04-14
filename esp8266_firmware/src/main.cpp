@@ -1,18 +1,11 @@
 /*
- * EggD1-Firmware by Rafal Vonau (ESP8266 port)
+ * EspEggBot-firmware by Rafal Vonau (ESP8266 port)
  *
  * Based on: Eggduino-Firmware by Joachim Cerny, 2014
  *
  * Thanks to the Eggbot-Team for such a funny and enjoable concept!
  * Thanks to my wife and my daughter for their patience. :-)
  */
-
-// implemented Eggbot-Protocol-Version v13
-// EBB-Command-Reference, I sourced from: http://www.schmalzhaus.com/EBB/EBBCommands.html
-// no homing sequence, switch-on position of pen will be taken as reference point.
-// No collision-detection!!
-// Note: Maximum-Speed in Inkscape is 1000 Steps/s. You could enter more, but then Pythonscript sends nonsense.
-// EBB-Coordinates are coming in for 16th-Microstepmode. The Coordinate-Transforms are done in weired integer-math. Be careful, when you diecide to modify settings.
 
 // ==-- HW connection --==
 // STEP1(EGG)- GPIO14 (D5)
@@ -30,9 +23,9 @@ extern "C" {
 	#include <os_type.h>
 }
 #include <functional>
-#include <ESPAsyncTCP.h>       /* ESPAsyncTCP-esphome@1.2.2                   */
+#include <ESPAsyncTCP.h>
 #include <ArduinoOTA.h>
-#include "SerialCommand.h" //nice lib from Stefan Rado, https://github.com/kroimon/Arduino-SerialCommand
+#include "SerialCommand.h"
 #include "NetworkCommand.h"
 #include "HTTPCommand.h"
 #include <EEPROM_Rotate.h>
@@ -164,7 +157,6 @@ void setup()
 	}
 	if (got_one == 0) {
 		pdebug("Starting in AP mode\n");
-		DNSServer dnsServer;
 		WiFi.softAP("EspEggBootAP");
 		dnsServer.start(53, "*", WiFi.softAPIP());
 	}
