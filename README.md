@@ -2,26 +2,26 @@
 
 ## Info
 
-An [EggBot](https://egg-bot.com/) is a machine for drawing on eggs. I built an [EggBot](https://www.thingiverse.com/thing:3431363) which uses 3D printed parts.
-As I'm using an ESP8266 for controlling the steppers and the servos I couldn't use the orginal firmware. This repository contains the software for my EggBot, features are:
+This repository contains the software for my ESP8266 based EggBot.
+An [EggBot](https://egg-bot.com/) is a machine for drawing on eggs. I built an eggbot from 3d printed parts from the [thingiverse](https://www.thingiverse.com/thing:3431363) website. 
+As I'm using an D1 mini(ESP8266) for controlling the steppers and the servo. 
 
 The project is based on:
-- [EggDuino](https://github.com/schlion/EggDuino) - code ported to ESP8266,
-- [EggEsp](https://github.com/M4GNV5/EggEsp) - www page (svg to GCODE conversion),
-- [EggBot Inkscape plugin]http://wiki.evilmadscientist.com/Installing_software
+- [EggDuino](https://github.com/schlion/EggDuino) - some code ported to ESP8266,
+- [EggBot Inkscape plugin](http://wiki.evilmadscientist.com/Installing_software) - I modified the plugin to automatically detect the USB to UART converter present on the D1 mini board and in case it fails to detect the USB converter, try to connect via TCP with eggbot.local:2500 address.
 
 Features:
 - Implemented Eggbot-Protocol-Version 2.1.0
 - Turn-on homing: switch-on position of pen will be taken as reference point.
 - No collision-detection!!
 - Supported Servos: standard analog mini servos like TG9e, SG90, ES08MA, HXT900, etc.
-- Taking svgs directly (over www) -> no need for external software
+- Taking svgs directly (over www) -> no need for external software (needs internet connection).
 - Inkscape plugin (commands over serial port or TCP socket on port 2500).
 
 The test project was built on D1 mini board connected to PC computer over USB as /dev/ttyUSB0 under Linux.
 Modify Wifi client settings in main.cpp file:
-#define WIFI_SSID                "EggBot"
-#define WIFI_PASS                "EggBotPass"
+* #define WIFI_SSID                "EggBot"
+* #define WIFI_PASS                "EggBotPass"
 
 # Parts needed:
 * D1 mini (ESP8266),
@@ -29,8 +29,8 @@ Modify Wifi client settings in main.cpp file:
 * DC/DC converter 5V to 3.3V,
 * 2 x TMC2208/A4988/equivalent,
 * 2 x Stepper mottor Nema 17
-* Servo SG90
-* 3D printed and mechanical parts from [EggBot](https://www.thingiverse.com/thing:3431363)
+* Servo SG90/equivalent
+* 3D printed and mechanical parts from [thingiverse](https://www.thingiverse.com/thing:3431363)
 * wires
 * connectors
 
@@ -45,7 +45,7 @@ Modify Wifi client settings in main.cpp file:
 
 # Wiring
 
-![alt tag](https://github.com/BubuHub/EspEggBot/blob/main/blob/assets/schematic.png)
+![alt tag](https://github.com/BubuHub/EspEggBot/blob/master/blob/assets/schematic.png)
 
 ## Building
 
@@ -53,11 +53,10 @@ The project uses platformio build environment.
 [PlatformIO](https://platformio.org/) - Professional collaborative platform for embedded development.
 
 * install PlatformIO
-* enter project directory
+* enter project directory (esp8266_firmware)
 * connect Webmos D1 mini board to PC computer over USB cable.
 * type in terminal:
-  platformio run
-  platformio upload
+  platformio run -t upload
 
 You can also use IDE to build this project on Linux/Windows/Mac. My fvorite ones:
 * [Code](https://code.visualstudio.com/) 
@@ -66,31 +65,10 @@ You can also use IDE to build this project on Linux/Windows/Mac. My fvorite ones
 ## Inkscape plugin installation
 
 Installation:
-- Install Inkscape Tools wit Eggbot extension. Detailed instructions: (You just need to complete Steps 1 and 2)
-http://wiki.evilmadscientist.com/Installing_software
-
-- D1 mini cannot be detected by default by the Eggbot-extension
-    But we can fix it on our own.  
-    Go to your home folder (On Windows you must show hidden files and enter AppData directory) and navigate to subfolder .\App\Inkscape\share\extensions
-
-For version 2.7.1:
-    - open file "ebb_serial.py" in text editor and search for the following block:
-
-        EBBport = None
-        for port in comPortsList:
-            if port[1].startswith("EiBotBoard"):
-                EBBport = port[0]   #Success; EBB found by name match.
-                break   #stop searching-- we are done.
-        if EBBport is None:
-            for port in comPortsList:
-                if port[2].startswith("USB VID:PID=04D8:FD92"):
-                    EBBport = port[0] #Success; EBB found by VID/PID match.
-                    break   #stop searching-- we are done.      
- 
-    - replace "04D8:FD92" with the VID/PID of your Arduino device.  
-    - alternatively, you can replace "EBBport = None" with your specific port number:
-        EBBport = "COMxx"               #Windows
-        EBBport = "/dev/tty[something]" #Linux/Mac
+1. Install inkscape version 0.94
+2. Copy inkscape_plugin subdirectories to inkscape user folder:
+* On Linux   (~/.config/inkscape/),
+* On Windows (c:\Users\[UserName]\AppData\Roaming\inkscape\)
 
 Enjoy :-)
 
