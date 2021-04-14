@@ -4,7 +4,7 @@
 
 This repository contains the software for my ESP8266 based EggBot.
 An [EggBot](https://egg-bot.com/) is a machine for drawing on eggs. I built an eggbot from 3d printed parts from the [thingiverse](https://www.thingiverse.com/thing:3431363) website. 
-As I'm using an D1 mini(ESP8266) for controlling the steppers and the servo. 
+I'm using an D1 mini(ESP8266) for controlling the steppers and the servo. 
 
 The project is based on:
 - [EggDuino](https://github.com/schlion/EggDuino) - some code ported to ESP8266,
