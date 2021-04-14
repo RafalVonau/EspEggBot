@@ -354,14 +354,14 @@ static void cmdAbsMove(CommandQueueItem *c, int speed)
 	if (dY < 0) aY = -dY; else aY = dY;
 
 	/* Calculate duration in [ms] */
-	if (aX || aY) {
+	if ((aX) || (aY)) {
 		if (aX > aY) {
 			duration = (aX * 1000)/speed;
 		} else {
 			duration = (aY * 1000)/speed;
 		}
+		m2d->goTo((uint16_t)duration, dX, dY);
 	}
-	m2d->goTo((uint16_t)duration, dX, dY);
 	g_pos_x = newX;
 	g_pos_y = newY;
 	c->sendAck();
