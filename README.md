@@ -47,7 +47,7 @@ Uncomment and modify Wifi client settings in secrets.h file:
 
 # Wiring
 
-![alt tag](https://github.com/BubuHub/EspEggBot/blob/master/blob/assets/schematic.png)
+![alt tag](https://github.com/RafalVonau/EspEggBot/blob/master/blob/assets/schematic.png)
 
 ## Building
 
